@@ -8,6 +8,7 @@ import scipy.io as sci
 import numpy as np
 import os
 import shutil
+import cv2
 
 
 if not os.path.isdir('RefactoredCars'):
@@ -77,7 +78,7 @@ print('\nСоздано ', len(os.listdir(pathToTrainImages)),' директор
 
 # Переносим train картинки в новые директории
 
-print('\nНачинаю перенос картинок train в новые директории')
+print('\nНачинаю изменение размерности и перенос картинок train в новые директории')
 
 for i in range(num_images):
 
@@ -85,8 +86,15 @@ for i in range(num_images):
     fname = fnames[i]
     sourcePath = os.path.join('Images', 'cars_train', fname)
     destinationPath = os.path.join(pathToTrainImages, indexToNameClass[indxClass - 1], fname)
-    if not os.path.isfile(destinationPath):
-        shutil.copyfile(sourcePath, destinationPath)
+
+    src = cv2.imread(sourcePath, cv2.IMREAD_UNCHANGED)
+    out = cv2.resize(src, (224, 224))
+
+    cv2.imwrite(destinationPath, out) 
+
+
+    #if not os.path.isfile(destinationPath):
+    #    shutil.copyfile(sourcePath, destinationPath)
 
     if i % 500 == 0:
         print('Перенесено ', i, ' картинок')
@@ -157,7 +165,7 @@ print('\nСоздано ', len(os.listdir(pathToTestImages)),' директор�
 
 # Переносим test картинки в новые директории
 
-print('\nНачинаю перенос картинок test в новые директории')
+print('\nНачинаю изменение размерности и перенос картинок test в новые директории')
 
 for i in range(num_test_images):
 
@@ -165,8 +173,14 @@ for i in range(num_test_images):
     fname = fnames_test[i]
     sourcePath = os.path.join('Images', 'cars_test', fname)
     destinationPath = os.path.join(pathToTestImages, indexToNameClass[indxClass - 1], fname)
-    if not os.path.isfile(destinationPath):
-        shutil.copyfile(sourcePath, destinationPath)
+    
+    src = cv2.imread(sourcePath, cv2.IMREAD_UNCHANGED)
+    out = cv2.resize(src, (224, 224))
+
+    cv2.imwrite(destinationPath, out) 
+    
+    #if not os.path.isfile(destinationPath):
+    #    shutil.copyfile(sourcePath, destinationPath)
 
     if i % 500 == 0:
         print('Перенесено ', i, ' картинок')
@@ -193,7 +207,7 @@ print('\nСоздано ', len(os.listdir(pathToValidImages)),' директор
 
 # Переносим validation картинки в новые директории
 
-print('\nНачинаю перенос картинок validation в новые директории')
+print('\nНачинаю изменение размерности и перенос картинок validation в новые директории')
 
 for i in range(num_test_images):
 
@@ -201,8 +215,14 @@ for i in range(num_test_images):
     fname = fnames_valid[i]
     sourcePath = os.path.join('Images', 'cars_test', fname)
     destinationPath = os.path.join(pathToValidImages, indexToNameClass[indxClass - 1], fname)
-    if not os.path.isfile(destinationPath):
-        shutil.copyfile(sourcePath, destinationPath)
+    
+    src = cv2.imread(sourcePath, cv2.IMREAD_UNCHANGED)
+    out = cv2.resize(src, (224, 224))
+
+    cv2.imwrite(destinationPath, out) 
+    
+    #if not os.path.isfile(destinationPath):
+    #    shutil.copyfile(sourcePath, destinationPath)
 
     if i % 500 == 0:
         print('Перенесено ', i, ' картинок')
