@@ -1,4 +1,6 @@
-def check_accuracy(model, dataLoader, device=torch.device('cpu')):
+import torch
+
+def check_accuracy(model, dataLoader, typeOfCheck, device=torch.device('cpu')):
   """
   Checking accuracy on given dataSet in dataLoader
   """
@@ -22,8 +24,8 @@ def check_accuracy(model, dataLoader, device=torch.device('cpu')):
       num_samples += preds.shape[0]
       num_correct += (preds == y).sum()
 
-      #if typeOfCheck == 'train' and i == 100: # Чтобы проверяться не на всём огромном train сете (16 * 64 = 1024 как и у validation)
-      #  break
+      if typeOfCheck == 'train' and i == 100: # Чтобы проверяться не на всём огромном train сете (16 * 64 = 1024 как и у validation)
+       break
 
     acc = float(num_correct) / num_samples
     print('Got %d / %d correct (%.2f) in %s'% (num_correct, num_samples, 100 * acc, typeOfCheck))
@@ -31,7 +33,7 @@ def check_accuracy(model, dataLoader, device=torch.device('cpu')):
 
 
 
-def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, device=torch.device('cpu'), printAndSaveEvery=100, continueTraining=None, savePath = '/content/drive/MyDrive/'):
+def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, device=torch.device('cpu'), printAndSaveEvery=None, continueTraining=None, savePath = '/content/drive/MyDrive/'):
   """
   Function for making model training
 
@@ -75,7 +77,7 @@ def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, de
 
       optimizer.step()
 
-      if t % printAndSaveEvery == 0 and t != 0:
+      if printAndSaveEvery is not None and t != 0 and t % printAndSaveEvery == 0:
         print("Iteration " + str(t) + ":")
         train_acc = check_accuracy(model, trainLoader, 'train', device)
         val_acc = check_accuracy(model, validationLoader, 'validation', device)
@@ -89,7 +91,7 @@ def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, de
           torch.save({
               'Model_state_dict': model.state_dict(),
               'Optimizer_state_dict': optimizer.state_dict(),
-              'Num_epoch': e,
+              'Num_epoch': e + 1,
               'Train_accs': train_accuracies,
               'Val_accs': val_accuracies
           }, join(savePath, 'best_model.pt'))
@@ -107,7 +109,7 @@ def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, de
         'Num_epoch': e + 1,
         'Train_accs': train_accuracies,
         'Val_accs': val_accuracies
-    }, join(savePath, 'best_model.pt'))
+    }, join(savePath, 'model.pt'))
 
     if best_acc < val_acc:
           print("Goten new best val accuracy. Save new best model")
@@ -115,7 +117,7 @@ def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, de
           torch.save({
               'Model_state_dict': model.state_dict(),
               'Optimizer_state_dict': optimizer.state_dict(),
-              'Num_epoch': e,
+              'Num_epoch': e + 1,
               'Train_accs': train_accuracies,
               'Val_accs': val_accuracies
           }, join(savePath, 'best_model.pt'))
@@ -125,7 +127,9 @@ def train_model(model, optimizer, trainLoader, validationLoader, num_epoch=1, de
 
 def show_accuracy_history(train_acc, val_acc):
 
-    if train_acc is not list or val_acc is not list:
+    import matplotlib.pyplot as plt
+
+    if type(train_acc) is not list or type(val_acc) is not list:
         print('train and validation accuracies must be lists')
         return
 
